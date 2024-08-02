@@ -9,8 +9,8 @@ export const dataSourceOptions: DataSourceOptions = {
   password: 'root',
   database: 'blog-nestjs',
   entities: ['dist/**/*.entity.js'],
-  // migrations: ['dist/db/migrations/*.js'],
-  migrations: ["dist/migrations/**/*{.js,.ts}"],
+  migrations: ['dist/db/migrations/*.js'],
+  // migrations: ["dist/migrations/**/*{.js,.ts}"],
   synchronize: false,
 };
 const dataSource = new DataSource(dataSourceOptions);
