@@ -10,7 +10,8 @@ export const dataSourceOptions: DataSourceOptions = {
   database: 'blog-nestjs',
   entities: ['dist/**/*.entity.js'],
   migrations: ['dist/db/migrations/*.js'],
-  // migrations: ["dist/migrations/**/*{.js,.ts}"],
+  // entities: ['dist/entities/**/*{.js,.ts}'],
+  // migrations: ['dist/migrations/**/*{.js,.ts}'],
   synchronize: false,
 };
 const dataSource = new DataSource(dataSourceOptions);
