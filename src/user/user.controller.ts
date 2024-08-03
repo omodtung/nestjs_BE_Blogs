@@ -8,6 +8,10 @@ import {
   Put,
   Query,
   UseGuards,
+  Req,
+  UploadedFile,
+  BadRequestException,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { FilterUserDto } from './dto/filter-user.dto';
@@ -15,11 +19,16 @@ import { User } from './entities/user.entity';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-
+import { FileInterceptor } from '@nestjs/platform-express';
+import { storageConfig } from 'helpers/config';
+import { extname } from 'path';
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
   @UseGuards(AuthGuard)
+  //   @ApiQuery({ name: 'page' })
+  //     @ApiQuery({ name: 'items_per_page' })
+  //     @ApiQuery({ name: 'search' })
   @Get()
   findAll(@Query() query: FilterUserDto): Promise<User[]> {
     console.log(query);
@@ -46,5 +55,46 @@ export class UserController {
   @Get(':id')
   findOne(@Param('id') id: string): Promise<User> {
     return this.userService.findOne(Number(id));
+  }
+
+  @Post('upload-avatar')
+  @UseGuards(AuthGuard)
+  // viet validation cho file
+  @UseInterceptors(
+    FileInterceptor('avatar', {
+      storage: storageConfig('avatar'),
+      fileFilter: (req, file, cb) => {
+        const ext = extname(file.originalname);
+        const allowedExtArr = ['.jpg', '.png', '.jpeg'];
+        if (!allowedExtArr.includes(ext)) {
+          req.fileValidationError = `wrong extension type accepts file ext are:${allowedExtArr.toString()}`;
+          cb(null, false);
+        } else {
+          const fileSize = parseInt(req.headers['content-length']);
+          if (fileSize > 1024 * 1024 * 5) {
+            req.fileValidationError =
+              'File size is too large. Accepted file size is less than 5 MB';
+            cb(null, false);
+          } else {
+            cb(null, true);
+          }
+        }
+      },
+    }),
+  )
+  uploadAvatar(@Req() req: any, @UploadedFile() file: Express.Multer.File) {
+    console.log('upload avatar');
+    console.log('user data', req.user_data);
+    console.log(file);
+    if (req.fileValidationError) {
+      throw new BadRequestException(req.fileValidationError);
+    }
+    if (!file) {
+      throw new BadRequestException('File is required');
+    }
+    return this.userService.updateAvatar(
+      req.user_data.id,
+      file.destination + '/' + file.filename,
+    );
   }
 }

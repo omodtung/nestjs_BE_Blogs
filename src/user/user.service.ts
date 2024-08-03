@@ -55,8 +55,6 @@ export class UserService {
     const hashPassword = await bcrypt.hash(createUserDto.password, 10);
     return await this.userRepository.save(createUserDto);
     // const hashPassword = await this.hashPassword(createUserDto.password);
-
-   
   }
 
   async update(
@@ -71,5 +69,8 @@ export class UserService {
   }
   async findOne(id: number): Promise<User> {
     return await this.userRepository.findOneBy({ id });
+  }
+  async updateAvatar(id: number, avatar: string): Promise<UpdateResult> {
+    return await this.userRepository.update(id, { avatar });
   }
 }
