@@ -44,7 +44,7 @@ export class UserService {
     return {
       data: res,
       total,
-      currenPage: page,
+      currentPage: page,
       nextPage,
       prevPage,
       lastPage,
