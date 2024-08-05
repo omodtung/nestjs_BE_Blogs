@@ -23,9 +23,12 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { storageConfig } from 'helpers/config';
 import { extname } from 'path';
 import { FilterPostDto } from './dto/filter-post.dto';
+import { Post as post} from './entities/post.entity';
 @Controller('post')
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(private readonly postService: PostService) {
+  }
+
   @UseGuards(AuthGuard)
   @UsePipes(ValidationPipe)
   @Post()
@@ -57,7 +60,11 @@ export class PostController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     console.log(req['user_data']);
+    console.log("------------------------")
     console.log(createPostDto);
+  console.log("----------------------")
+  console.log ( createPostDto.user);
+  console.log ("---------------------")
     console.log(file);
     if (req.fileValidationError) {
       throw new BadRequestException(req.fileValidationError);
@@ -72,27 +79,27 @@ export class PostController {
     });
   }
 
-// @UseGuards(AuthGuard)
-// @UseGuards(AuthGuard)
-// @Get()
-// findAll(@Query() query: FilterPostDto): Promise<any> {
-//     return this.postService.findAll(query);
-// }
 
-// @UseGuards(AuthGuard)
-// @Get(':id')
-// findDetail(@Param('id') id: string): Promise<PostEntity> {
-//     return this.postService.findDetail(Number(id));
-// }
+@UseGuards(AuthGuard)
+@Get()
+findAll(@Query() query: FilterPostDto): Promise<any> {
+    return this.postService.findAll(query);
+}
+
+@UseGuards(AuthGuard)
+@Get(':id')
+findDetail(@Param('id') id: string): Promise<post> {
+    return this.postService.findDetail(Number(id));
+}
 
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postService.update(+id, updatePostDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
+  //   return this.postService.update(+id, updatePostDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.postService.remove(+id);
+  // }
 }
