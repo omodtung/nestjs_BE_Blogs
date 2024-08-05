@@ -23,11 +23,10 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { storageConfig } from 'helpers/config';
 import { extname } from 'path';
 import { FilterPostDto } from './dto/filter-post.dto';
-import { Post as post} from './entities/post.entity';
+import { Post as post } from './entities/post.entity';
 @Controller('post')
 export class PostController {
-  constructor(private readonly postService: PostService) {
-  }
+  constructor(private readonly postService: PostService) {}
 
   @UseGuards(AuthGuard)
   @UsePipes(ValidationPipe)
@@ -60,11 +59,11 @@ export class PostController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     console.log(req['user_data']);
-    console.log("------------------------")
+    console.log('------------------------');
     console.log(createPostDto);
-  console.log("----------------------")
-  console.log ( createPostDto.user);
-  console.log ("---------------------")
+    console.log('----------------------');
+    console.log(createPostDto.user);
+    console.log('---------------------');
     console.log(file);
     if (req.fileValidationError) {
       throw new BadRequestException(req.fileValidationError);
@@ -79,27 +78,62 @@ export class PostController {
     });
   }
 
-
-@UseGuards(AuthGuard)
-@Get()
-findAll(@Query() query: FilterPostDto): Promise<any> {
+  @UseGuards(AuthGuard)
+  @Get()
+  findAll(@Query() query: FilterPostDto): Promise<any> {
     return this.postService.findAll(query);
-}
+  }
 
-@UseGuards(AuthGuard)
-@Get(':id')
-findDetail(@Param('id') id: string): Promise<post> {
+  @UseGuards(AuthGuard)
+  @Get(':id')
+  findDetail(@Param('id') id: string): Promise<post> {
     return this.postService.findDetail(Number(id));
-}
+  }
 
+  @UseGuards(AuthGuard)
+  @Patch(':id')
+  @UseInterceptors(
+    FileInterceptor('thumbnail', {
+      storage: storageConfig('post'),
+      fileFilter: (req, file, cb) => {
+        const ext = extname(file.originalname);
+        const allowedExtArr = ['.jpg', '.png', '.jpeg'];
+        if (!allowedExtArr.includes(ext)) {
+          req.fileValidationError = `Wrong extension type. Accepted file ext are: ${allowedExtArr.toString()}`;
+          cb(null, false);
+        } else {
+          const fileSize = parseInt(req.headers['content-length']);
+          if (fileSize > 1024 * 1024 * 5) {
+            req.fileValidationError =
+              'File size is too large. Accepted file size is less than 5 MB';
+            cb(null, false);
+          } else {
+            cb(null, true);
+          }
+        }
+      },
+    }),
+  )
+  update(
+    @Param('id') id: string,
+    @Req() req: any,
+    @Body() updatePostDto: UpdatePostDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (req.fileValidationError) {
+      throw new BadRequestException(req.fileValidationError);
+    }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-  //   return this.postService.update(+id, updatePostDto);
-  // }
+    if (file) {
+      updatePostDto.thumbnail = file.destination + '/' + file.filename;
+    }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.postService.remove(+id);
-  // }
+    return this.postService.update(Number(id), updatePostDto);
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete(':id')
+  delete(@Param('id') id: string) {
+    return this.postService.delete(Number(id));
+  }
 }

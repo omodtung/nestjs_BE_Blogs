@@ -4,7 +4,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Post } from './entities/post.entity';
-import { Like, Repository } from 'typeorm';
+import { DeleteResult, Like, Repository, UpdateResult } from 'typeorm';
 import { FilterPostDto } from './dto/filter-post.dto';
 import { last } from 'rxjs';
 
@@ -107,11 +107,11 @@ export class PostService {
   }
 
   // }
-  // update(id: number, updatePostDto: UpdatePostDto) {
-  //   return `This action updates a #${id} post`;
-  // }
+  async update(id: number, updatePostDto: UpdatePostDto): Promise<UpdateResult> {
+    return await this.postRepository.update(id, updatePostDto)
+}
 
-  // remove(id: number) {
-  //   return `This action removes a #${id} post`;
-  // }
+async delete(id: number): Promise<DeleteResult> {
+  return await this.postRepository.delete(id);
+}
 }
