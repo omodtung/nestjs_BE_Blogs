@@ -108,7 +108,9 @@ export class PostService {
 
   // }
   async update(id: number, updatePostDto: UpdatePostDto): Promise<UpdateResult> {
+    console.log(this.postRepository.update(id, updatePostDto))
     return await this.postRepository.update(id, updatePostDto)
+  
 }
 
 async delete(id: number): Promise<DeleteResult> {
