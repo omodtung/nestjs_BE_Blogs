@@ -12,6 +12,7 @@ import {
   UploadedFile,
   BadRequestException,
   UseInterceptors,
+  ParseArrayPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { FilterUserDto } from './dto/filter-user.dto';
@@ -35,6 +36,13 @@ export class UserController {
     return this.userService.findAll(query);
   }
 
+  @Get('profile')
+  @UseGuards(AuthGuard)
+  profile(@Req() req: any): Promise<User> {
+    // console.log('req => ', req.user_data.id);
+    return this.userService.findOne(Number(req.user_data.id));
+  }
+
   @UseGuards(AuthGuard)
   @Post()
   create(@Body() createUserDto: CreateUserDto): Promise<User> {
@@ -55,6 +63,15 @@ export class UserController {
   @Get(':id')
   findOne(@Param('id') id: string): Promise<User> {
     return this.userService.findOne(Number(id));
+  }
+
+  @Delete('multiple')
+  multipleDelete(
+    @Query('ids', new ParseArrayPipe({ items: String, separator: ',' }))
+    ids: string[],
+  ) {
+    console.log('delete multi=> ', ids);
+    return this.userService.multipleDelete(ids);
   }
 
   @Post('upload-avatar')
@@ -98,3 +115,4 @@ export class UserController {
     );
   }
 }
+// http://localhost:5000/user/multiple?ids=11,13
