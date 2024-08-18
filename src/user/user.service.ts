@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Like, Repository, UpdateResult } from 'typeorm';
+import { DeleteResult, In, Like, Repository, UpdateResult } from 'typeorm';
 import { User } from './entities/user.entity';
 import { FilterUserDto } from './dto/filter-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -72,5 +72,10 @@ export class UserService {
   }
   async updateAvatar(id: number, avatar: string): Promise<UpdateResult> {
     return await this.userRepository.update(id, { avatar });
+  }
+  async multipleDelete(ids: string[]): Promise<DeleteResult> {
+    // string cover to Array Like [1,2,4]
+    //and that will use In(ids) to delete 1, 2,4
+    return await this.userRepository.delete({ id: In(ids) })
   }
 }
