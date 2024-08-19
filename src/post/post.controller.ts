@@ -74,7 +74,7 @@ export class PostController {
 
     return this.postService.create(req['user_data'].id, {
       ...createPostDto,
-      thumbnail: file.destination + '/' + file.filename,
+      thumbnail: 'post' + '/' + file.filename,
     });
   }
 
@@ -125,7 +125,7 @@ export class PostController {
     }
 
     if (file) {
-      updatePostDto.thumbnail = file.destination + '/' + file.filename;
+      updatePostDto.thumbnail = 'post' + '/' + file.filename;
     }
 
     return this.postService.update(Number(id), updatePostDto);
