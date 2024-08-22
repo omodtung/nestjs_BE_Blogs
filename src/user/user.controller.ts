@@ -13,6 +13,7 @@ import {
   BadRequestException,
   UseInterceptors,
   ParseArrayPipe,
+  SetMetadata,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { FilterUserDto } from './dto/filter-user.dto';
@@ -26,18 +27,17 @@ import { extname } from 'path';
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
+  
   @UseGuards(AuthGuard)
-  //   @ApiQuery({ name: 'page' })
-  //     @ApiQuery({ name: 'items_per_page' })
-  //     @ApiQuery({ name: 'search' })
+  @SetMetadata('roles', ['Admin'])
   @Get()
   findAll(@Query() query: FilterUserDto): Promise<User[]> {
     console.log(query);
     return this.userService.findAll(query);
   }
-
   @Get('profile')
   @UseGuards(AuthGuard)
+  @SetMetadata('roles', ['Admin'])
   profile(@Req() req: any): Promise<User> {
     // console.log('req => ', req.user_data.id);
     return this.userService.findOne(Number(req.user_data.id));
@@ -54,7 +54,10 @@ export class UserController {
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(Number(id), updateUserDto);
   }
+
+  // @SetMetadata('roles', ['Admin'])
   @UseGuards(AuthGuard)
+  
   @Delete(':id')
   delete(@Param('id') id: string) {
     return this.userService.delete(Number(id));

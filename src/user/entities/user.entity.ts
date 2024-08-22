@@ -30,6 +30,9 @@ export class User {
   @Column()
   password: string;
 
+  @Column({default:'User'})
+  roles :string ;
+
   @Column({ default: 1 })
   status: number;
 
