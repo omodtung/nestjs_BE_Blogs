@@ -17,8 +17,11 @@ export class Post {
   @Column()
   title: string;
 
-  @Column()
+  @Column({type :'longtext'})
   description: string;
+
+  @Column({type :'longtext'})
+  summary : string
 
   @Column()
   thumbnail: string;
