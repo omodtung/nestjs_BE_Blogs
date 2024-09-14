@@ -47,7 +47,7 @@ export class UserController {
   @Post()
   create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.userService.create(createUserDto);
-  }
+  } 
 
   @UseGuards(AuthGuard)
   @Put(':id')

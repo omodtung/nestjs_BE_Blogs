@@ -14,6 +14,7 @@ import {
   UploadedFile,
   BadRequestException,
   Query,
+  SetMetadata,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -78,13 +79,15 @@ export class PostController {
     });
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
+  @SetMetadata('isPublic',true)
   @Get()
   findAll(@Query() query: FilterPostDto): Promise<any> {
     return this.postService.findAll(query);
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
+  @SetMetadata('isPublic',true)
   @Get(':id')
   findDetail(@Param('id') id: string): Promise<post> {
     return this.postService.findDetail(Number(id));

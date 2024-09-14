@@ -1,0 +1,10 @@
+#3
+auth-service 18.01-26.57
+controller 18.10 -25.01
+npm install class-validator
+npm install class-transformer
+npm i --save @nestjs/config
+
+
+Range 2
+5 -> 9
